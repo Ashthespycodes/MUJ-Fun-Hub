@@ -1,4 +1,4 @@
-# Fun@MUJ 🎉
+# MUJConnect 🎉
 A student guide to **fun things to do at Manipal University Jaipur (MUJ)**.  
 This website/app helps students explore the best **eating spots, study spaces, hangout places, and events** on campus, plus share thoughts anonymously.  
 The motto: *"Find, Explore, Enjoy MUJ!"*
