@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -12,12 +19,30 @@ const LoginScreen = ({ navigation }) => {
       return;
     }
 
+    if (!validateEmail(email)) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return;
+    }
+
+    setIsLoading(true);
     try {
-      await AsyncStorage.setItem('userToken', 'dummy-token');
-      await AsyncStorage.setItem('userEmail', email);
-      navigation.navigate('Main');
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // In a real app, this would be an API call to authenticate
+      // For demo purposes, we'll use hardcoded credentials
+      if (email === 'demo@campus.edu' && password === 'password') {
+        await AsyncStorage.setItem('userToken', 'dummy-token');
+        await AsyncStorage.setItem('userEmail', email);
+        navigation.replace('Main'); // Use replace to prevent going back to login
+      } else {
+        Alert.alert('Login Failed', 'Invalid email or password');
+      }
     } catch (error) {
       Alert.alert('Error', 'Login failed. Please try again.');
+      console.error('Login error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -39,25 +64,62 @@ const LoginScreen = ({ navigation }) => {
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
+            autoComplete="email"
+            textContentType="emailAddress"
+            accessibilityLabel="Email input"
           />
           
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            placeholderTextColor="#888"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={[styles.input, styles.passwordInput]}
+              placeholder="Password"
+              placeholderTextColor="#888"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              autoComplete="password"
+              textContentType="password"
+              accessibilityLabel="Password input"
+            />
+            <TouchableOpacity 
+              style={styles.visibilityToggle}
+              onPress={() => setShowPassword(!showPassword)}
+              accessibilityLabel={showPassword ? "Hide password" : "Show password"}
+            >
+              <Text style={styles.visibilityText}>
+                {showPassword ? 'Hide' : 'Show'}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
         
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Login</Text>
+        <TouchableOpacity 
+          style={[styles.loginButton, isLoading && styles.disabledButton]} 
+          onPress={handleLogin}
+          disabled={isLoading}
+          accessibilityLabel="Login button"
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.loginButtonText}>Login</Text>
+          )}
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.signupButton} onPress={() => navigation.navigate('Signup')}>
-          <Text style={styles.signupButtonText}>Don't have an account? Sign Up</Text>
+        <TouchableOpacity 
+          style={styles.forgotButton}
+          onPress={() => Alert.alert('Reset Password', 'Password reset link will be sent to your email')}
+          accessibilityLabel="Forgot password"
+        >
+          <Text style={styles.forgotButtonText}>Forgot Password?</Text>
         </TouchableOpacity>
+        
+        <View style={styles.signupContainer}>
+          <Text style={styles.signupText}>Don't have an account? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+            <Text style={styles.signupLink}>Sign Up</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -87,7 +149,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   inputContainer: {
-    marginBottom: 30,
+    marginBottom: 20,
   },
   input: {
     height: 50,
@@ -99,26 +161,58 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e2e8f0',
   },
+  passwordContainer: {
+    position: 'relative',
+  },
+  passwordInput: {
+    paddingRight: 70,
+  },
+  visibilityToggle: {
+    position: 'absolute',
+    right: 15,
+    top: 15,
+  },
+  visibilityText: {
+    color: '#6366f1',
+    fontSize: 14,
+  },
   loginButton: {
     backgroundColor: '#6366f1',
     height: 50,
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 15,
+  },
+  disabledButton: {
+    backgroundColor: '#a5b4fc',
   },
   loginButtonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
   },
-  signupButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
+  forgotButton: {
+    alignSelf: 'center',
+    marginBottom: 30,
   },
-  signupButtonText: {
+  forgotButtonText: {
+    color: '#6366f1',
+    fontSize: 14,
+  },
+  signupContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  signupText: {
+    color: '#64748b',
+    fontSize: 16,
+  },
+  signupLink: {
     color: '#6366f1',
     fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
