@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/MUJ-Fun-Hub/static/css/main.fea8234c.css",
+    "main.js": "/MUJ-Fun-Hub/static/js/main.b1205a3b.js",
+    "index.html": "/MUJ-Fun-Hub/index.html",
+    "main.fea8234c.css.map": "/MUJ-Fun-Hub/static/css/main.fea8234c.css.map",
+    "main.b1205a3b.js.map": "/MUJ-Fun-Hub/static/js/main.b1205a3b.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.fea8234c.css",
+    "static/js/main.b1205a3b.js"
+  ]
+}
